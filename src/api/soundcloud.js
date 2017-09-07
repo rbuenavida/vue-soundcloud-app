@@ -11,7 +11,7 @@ export default {
             '&linked_partitioning=1'
 
         if (p.searchTerm) {
-            initialUrl += '&q=' + encodeURIComponent(p.searchTerm);
+            initialUrl += '&q=' + encodeURIComponent(p.searchTerm)
         }
 
         let url = p.nextHref || initialUrl
@@ -19,13 +19,13 @@ export default {
         // console.log(url)
 
         http.get(url, { withCredentials: false })
-            .then((result) => { cb( result.data );  } ) 
+            .then((result) => { cb( result.data )  } ) 
     },
 
     trackOembed(trackUrl, cb) {
-        let url = scBaseUrl + 'oembed?format=json&url=' + trackUrl
+        let url = scBaseUrl + 'oembed?auto_play=true&format=json&url=' + trackUrl
             
         http.get(url, { withCredentials: false })
-            .then((result) => { cb(result.data);  } )         
+            .then((result) => { cb(result.data)  } )         
     }
 }

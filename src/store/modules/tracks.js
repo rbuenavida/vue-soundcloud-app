@@ -12,35 +12,30 @@ const state = {
 
 // getters
 const getters = {
-  allTracks: state => state.allTracks,
-  hasMoreResults: state => state.nextHref && (state.allTracks.length > 5),
   /*
   getTrackById: (state, getters) => (id) => {
     return state.allTracks.find(track => track.id === id)
   },
   */
-  searchTerm: state => state.searchTerm,
-  activeTrack: state => state.activeTrack,
-  searchTerms: state => state.searchTerms
 }
 
 // actions
 const actions = {
   getTracks ({ commit }, params) {
-    let searchParams = { 
+    let p = { 
         searchTerm: params.searchTerm,
         nextHref: (params.useNextHref) ? state.nextHref : ''
     }
 
-    sc.tracksBySearchTerm(searchParams, tracks => {
-      commit(types.RECEIVE_TRACKS, { tracks })
+    sc.tracksBySearchTerm(p, tracks => {
+      commit(types.TRACKS_FETCHED, { tracks })
     })
   }
 }
 
 // mutations
 const mutations = {
-  [types.RECEIVE_TRACKS] (state, { tracks, chTerm }) {
+  [types.TRACKS_FETCHED] (state, { tracks, chTerm }) {
     state.allTracks = tracks.collection
     state.nextHref = tracks.next_href
   },
