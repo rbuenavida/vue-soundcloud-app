@@ -5,27 +5,30 @@ const scApiBaseUrl = 'https://api.soundcloud.com/'
 const scBaseUrl = 'http://soundcloud.com/'
 const pageSize = 6
 
-export default { 
-    tracksBySearchTerm (p, cb) {
-        let initialUrl = scApiBaseUrl + 'tracks/' + '?client_id=' + clientId + '&limit=' + pageSize + 
-            '&linked_partitioning=1'
+function tracksByUrl(url) {
+  return http.get(url, { withCredentials: false }).then(response => {
+    return {
+      tracks: response.data.collection,
+      nextTracks() {
+        return tracksByUrl(response.data.next_href);
+      }
+    };
+  });
+}
 
-        if (p.searchTerm) {
-            initialUrl += '&q=' + encodeURIComponent(p.searchTerm)
-        }
-
-        let url = p.nextHref || initialUrl
-        
-        // console.log(url)
-
-        http.get(url, { withCredentials: false })
-            .then((result) => { cb( result.data )  } ) 
-    },
-
-    trackOembed(trackUrl, cb) {
-        let url = scBaseUrl + 'oembed?auto_play=true&format=json&url=' + trackUrl
-            
-        http.get(url, { withCredentials: false })
-            .then((result) => { cb(result.data)  } )         
+export default {
+  tracksBySearchTerm (searchTerm) {
+    let initialUrl = `${scApiBaseUrl}tracks/?client_id=${clientId}&limit=${pageSize}&linked_partitioning=1`;
+    if (searchTerm) {
+        initialUrl += '&q=' + encodeURIComponent(searchTerm)
     }
+    return tracksByUrl(initialUrl)
+  },
+
+  trackOembed(trackUrl, cb) {
+    let url = scBaseUrl + 'oembed?auto_play=true&format=json&url=' + trackUrl
+
+    http.get(url, { withCredentials: false })
+      .then((result) => { cb(result.data) })
+  }
 }

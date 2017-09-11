@@ -18,8 +18,7 @@
     },
     methods: {
       activateSearch(term, index) {
-        this.$store.commit(types.SET_SEARCH_TERM, this.searchTerms[index]);
-        this.$store.dispatch('getTracks', { searchTerm: this.searchTerms[index] })
+        this.$store.dispatch('setSearchTerm', { term: this.searchTerms[index] })
       }
     }
   }

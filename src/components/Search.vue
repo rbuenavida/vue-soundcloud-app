@@ -20,11 +20,17 @@
 
 <script>
   import * as types from '../store/mutation-types'
+  import { mapActions } from 'vuex'
 
   export default {
+    data: () => {
+      return { 
+        term: ''
+      }
+    },
     computed: {
       showNext() {
-        return this.$store.state.tracks.nextHref && (this.$store.state.tracks.allTracks.length > 5)
+        return (this.$store.state.tracks.allTracks.length > 5)
       },
       tracks() {
         return this.$store.state.tracks.allTracks
@@ -32,22 +38,16 @@
       searchTerm: {
         get() { return this.$store.state.tracks.searchTerm },
         set(value) {
-          this.$store.commit(types.SET_SEARCH_TERM, value)
+          this.term = value;
         }
       }
     },
     methods: {
       newSearch(event) {
-        this.$store.dispatch('getTracks', {
-          searchTerm: this.searchTerm
-        })
-        this.$store.commit(types.ADD_SEARCH_TERM_HISTORY, this.searchTerm)
+        this.$store.dispatch('setSearchTerm', { term: this.term, history: true })
       },
       nextSearchResults(event) {
-        this.$store.dispatch('getTracks', {
-          searchTerm: this.searchTerm,
-          useNextHref: true
-        })
+        this.$store.dispatch('getNextTracks')
       },
       activeTrack(trackId) {
         this.$store.commit(types.SET_ACTIVE_TRACK, trackId)

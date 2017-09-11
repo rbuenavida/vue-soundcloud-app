@@ -4,7 +4,7 @@ import * as types from '../mutation-types'
 // initial state
 const state = {
   allTracks: [],
-  nextHref: '',
+  getNextTracks: null,
   activeTrack: {},
   searchTerm: '',
   searchTerms: ['trey', '3', 'lebens']
@@ -21,23 +21,29 @@ const getters = {
 
 // actions
 const actions = {
-  getTracks ({ commit }, params) {
-    let p = { 
-        searchTerm: params.searchTerm,
-        nextHref: (params.useNextHref) ? state.nextHref : ''
-    }
-
-    sc.tracksBySearchTerm(p, tracks => {
-      commit(types.TRACKS_FETCHED, { tracks })
+  setSearchTerm ({ commit }, params) {
+    commit(types.SET_SEARCH_TERM, params.term)
+    
+    sc.tracksBySearchTerm(params.term).then(results => {
+      commit(types.TRACKS_FETCHED, results);
     })
+
+    if (params.history) {
+      commit(types.ADD_SEARCH_TERM_HISTORY, params.term)
+    }
+  },
+  getNextTracks ({ commit }) {
+    state.getNextTracks().then(results => {
+      commit(types.TRACKS_FETCHED, results)
+    });
   }
 }
 
 // mutations
 const mutations = {
-  [types.TRACKS_FETCHED] (state, { tracks, chTerm }) {
-    state.allTracks = tracks.collection
-    state.nextHref = tracks.next_href
+  [types.TRACKS_FETCHED] (state, results) {
+    state.allTracks = results.tracks
+    state.getNextTracks = results.nextTracks;
   },
 
   [types.SET_ACTIVE_TRACK] (state, trackId) {
